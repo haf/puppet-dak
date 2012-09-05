@@ -23,6 +23,7 @@ for archives and details on how to subscribe.
 The aim is to be able to clone this repo and run:
 
 ```bash
+git clone git@github.com:haf/puppet-dak.git
 cd puppet-dak
 git submodule update --init
 bundle
@@ -32,6 +33,14 @@ vagrant up
 and have a finished debian repository running locally. While this is the aim,
 most likely are you going to have to configure your GPG keys before running
 `vagrant up`, because the repository requires signatures to work.
+
+### Requirements
+
+In order to do the above properly, you need ruby/rubygems installed; do this:
+
+```bash
+curl -L https://get.rvm.io | bash -s stable --ruby --gems=bundler
+```
 
 ## Future of this repo
 
