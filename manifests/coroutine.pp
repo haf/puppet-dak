@@ -1,21 +1,35 @@
 node 'coroutine.local' {
 
-  # you'll need to fix any broken apt-get sources first!
-  # http://askubuntu.com/questions/37753/how-can-i-get-apt-to-use-a-mirror-close-to-me-or-choose-a-faster-mirror
+  class { 'apt': }
 
-  $sentinel = "/var/lib/apt/first-puppet-run"
-  exec { "apt-update":
-    command => "/usr/bin/apt-get update && touch ${sentinel}",
-    onlyif => "/usr/bin/env test \\! -f ${sentinel} || /usr/bin/env test \\! -z \"$(find /etc/apt -type f -c
-newer ${sentinel})\"",
-    timeout => 3600
+  apt::sources_list {"mirror-1":
+    ensure  => present,
+    content => 'deb mirror://mirrors.ubuntu.com/mirrors.txt precise main restricted universe multiverse'
   }
+
+  apt::sources_list { 'mirror-2':
+    ensure => present,
+    content => 'deb mirror://mirrors.ubuntu.com/mirrors.txt precise-updates main restricted universe multiverse',
+  }
+  
+  apt::sources_list { 'mirror-3':
+    ensure => present,
+    content => 'deb mirror://mirrors.ubuntu.com/mirrors.txt precise-backports main restricted universe multiverse'
+  }
+
+  apt::sources_list { 'mirror-4':
+    ensure => present,
+    content => 'deb mirror://mirrors.ubuntu.com/mirrors.txt precise-security main restricted universe multiverse',
+  }
+
+  Apt::Sources_list['mirror-1'] -> Package <| |>
+  Apt::Sources_list['mirror-2'] -> Package <| |>
+  Apt::Sources_list['mirror-3'] -> Package <| |>
+  Apt::Sources_list['mirror-4'] -> Package <| |>
 
   Exec {
     path => '/usr/bin:/usr/sbin:/bin'
   }
-
-  Exec["apt-update"] -> Package <| |>
 
   File {
     owner  => 'root',
@@ -69,19 +83,6 @@ newer ${sentinel})\"",
     system => true
   }
 
-  file { '/home/dak':
-    ensure => directory,
-    owner  => 'dak',
-    mode   => '0755'
-  }
-  
-  file { '/home/dak/bin':
-    ensure => directory,
-    owner  => 'dak',
-    mode   => '0755',
-    require=> File['/home/dak']
-  }
-
   file { '/home/dak/.bash_profile':
     content => "PATH=\$PATH:/home/dak/bin\nexport PATH",
     require => [
@@ -90,26 +91,37 @@ newer ${sentinel})\"",
     ]
   }
 
+  file { '/home/dak/bin':
+    ensure => directory,
+    owner  => 'dak',
+    mode   => '0755',
+    require=> User['dak']
+  }
+
   file { '/home/dak/bin/dak':
     ensure   => link,
     owner    => 'dak',
-    target   => '/vagrant/dak/dak.py'
+    target   => '/vagrant/dak/dak.py',
+    require  => File['/home/dak/bin']
   }
 
   user { 'dak':
-    ensure => present,
-    system => true,
-    home   => "/home/dak",
-    gid    => ['ftpmaster', 'postgresql-admin'],
-    shell  => '/bin/bash',
-    require => [
+    ensure     => present,
+    system     => true,
+    home       => "/home/dak",
+    gid        => ['ftpmaster', 'postgresql-admin'],
+    shell      => '/bin/bash',
+    managehome => true,
+    require    => [
       Group['ftpmaster'],
       File['/home/dak']
     ]
   }
+
   group {'ftpteam':
     ensure => present
   }
+
   group { 'ftptrainee':
     ensure => present
   }
@@ -118,7 +130,8 @@ newer ${sentinel})\"",
 
   # CREATE USER dak CREATEROLE;
   postgresql::user { 'dak':
-    createrole => true
+    createrole => true,
+    require    => User['dak']
   }
 
   # CREATE DATABASE projectb WITH OWNER dak TEMPLATE template0 ENCODING 'SQL_ASCII';
