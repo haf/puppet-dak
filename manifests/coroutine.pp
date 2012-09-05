@@ -3,8 +3,6 @@ node 'coroutine.local' {
   # you'll need to fix any broken apt-get sources first!
   # http://askubuntu.com/questions/37753/how-can-i-get-apt-to-use-a-mirror-close-to-me-or-choose-a-faster-mirror
 
-  include postgresql
-  
   $sentinel = "/var/lib/apt/first-puppet-run"
   exec { "apt-update":
     command => "/usr/bin/apt-get update && touch ${sentinel}",
@@ -115,6 +113,8 @@ newer ${sentinel})\"",
   group { 'ftptrainee':
     ensure => present
   }
+
+  include postgresql
 
   # CREATE USER dak CREATEROLE;
   postgresql::user { 'dak':
