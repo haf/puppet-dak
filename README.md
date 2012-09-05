@@ -24,6 +24,7 @@ The aim is to be able to clone this repo and run:
 
 ```bash
 cd puppet-dak
+git submodule update --init
 bundle
 vagrant up
 ```
