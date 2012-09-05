@@ -114,7 +114,7 @@ node 'coroutine.local' {
     managehome => true,
     require    => [
       Group['ftpmaster'],
-      File['/home/dak']
+      User['dak']
     ]
   }
 
