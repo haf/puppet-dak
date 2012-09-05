@@ -42,6 +42,8 @@ In order to do the above properly, you need ruby/rubygems installed; do this:
 curl -L https://get.rvm.io | bash -s stable --ruby --gems=bundler
 ```
 
+Follow the instructions that the bash script gives you.
+
 ## Future of this repo
 
 I'm aiming to make it a pure puppet repository, without all the source-code of
