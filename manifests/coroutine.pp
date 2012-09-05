@@ -86,7 +86,7 @@ node 'coroutine.local' {
   file { '/home/dak/.bash_profile':
     content => "PATH=\$PATH:/home/dak/bin\nexport PATH",
     require => [
-      File['/home/dak'],
+      User['dak'],
       File['/home/dak/bin']
     ]
   }
