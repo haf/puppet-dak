@@ -25,3 +25,4 @@ web/transitions.yaml
 web/cruft-report-daily.txt
 web/pseudo-packages.*
 web/licenses/
+.vagrant
