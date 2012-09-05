@@ -1,6 +1,7 @@
 node 'coroutine.local' {
 
   class { 'apt': }
+  class { 'augeas': }
 
   apt::sources_list {"mirror-1":
     ensure  => present,
@@ -68,10 +69,23 @@ node 'coroutine.local' {
     require => File['/srv/dak']
   }
 
-  $deps = ['python', 'libaugeas0', 'augeas-lenses', 'libaugeas-ruby', 'vim',
-    'python-psycopg2', 'python-sqlalchemy', 'python-apt', 'gnupg', 'dpkg-dev', 'lintian',
-   'binutils-multiarch', 'python-yaml', 'less', 'python-ldap', 'python-pyrss2gen', 'python-rrdtool',
-   'symlinks', 'python-debian', 'postgresql-9.1-debversion'
+  $deps = ['python',
+    'vim',
+   'python-psycopg2',
+   'python-sqlalchemy',
+   'python-apt',
+   'gnupg',
+   'dpkg-dev',
+   'lintian',
+   'binutils-multiarch',
+   'python-yaml',
+   'less',
+   'python-ldap',
+   'python-pyrss2gen',
+   'python-rrdtool',
+   'symlinks',
+   'python-debian',
+   'postgresql-9.1-debversion'
   ]
 
   package { $deps:
@@ -126,7 +140,9 @@ node 'coroutine.local' {
     ensure => present
   }
 
-  include postgresql
+  class { 'postgresql':
+    require => Class['augeas']
+  }
 
   # CREATE USER dak CREATEROLE;
   postgresql::user { 'dak':
